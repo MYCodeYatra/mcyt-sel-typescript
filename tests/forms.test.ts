@@ -16,41 +16,52 @@ describe("Core UI Automation - Forms and Checkboxes", () => {
     }
   });
 
-  it("Should fill forms and handle checkboxes on practice site", async () => {
-    console.log("Navigating to https://practice.mycodeyatra.com/ ...");
-    await driver.get("https://practice.mycodeyatra.com/");
+  it("Should safely fill forms and toggle checkboxes", async () => {
+    console.log("Navigating to Form Practice Page...");
+    await driver.get("https://practice.mycodeyatra.com/#/form-practice");
     
+    // Wait for the form to render
+    await driver.wait(until.elementLocated(By.css("[data-testid='full-name']")), 5000);
+
     // 1. Text Inputs
-    const nameInput = await driver.findElement(By.css("#name"));
+    const nameInput = await driver.findElement(By.css("[data-testid='full-name']"));
+    await nameInput.clear();
     await nameInput.sendKeys("John Automation");
     console.log("Filled Name Input");
 
-    const emailInput = await driver.findElement(By.css(".email-field"));
+    const emailInput = await driver.findElement(By.css("[data-testid='email']"));
+    await emailInput.clear();
     await emailInput.sendKeys("john@example.com");
     console.log("Filled Email Input");
 
-    // 2. Radio Buttons
-    // Find the 'Male' radio button using CSS attribute selector
-    const maleRadioBtn = await driver.findElement(By.css("input[value='Male']"));
+    // 2. Radio Buttons (Safely Select)
+    const maleRadioBtn = await driver.findElement(By.css("[data-testid='gender-male']"));
     const isMaleSelected = await maleRadioBtn.isSelected();
     if (!isMaleSelected) {
+      // Sometimes we need to click the label wrapping the radio button in modern React apps
       await maleRadioBtn.click();
       console.log("Clicked Male Radio Button");
     }
 
-    // 3. Checkboxes
-    // Find the 'Reading' checkbox
-    const readingCheckbox = await driver.findElement(By.css("input[value='Reading']"));
-    const isReadingChecked = await readingCheckbox.isSelected();
-    if (!isReadingChecked) {
-      await readingCheckbox.click();
-      console.log("Checked the 'Reading' Checkbox");
+    // 3. Checkboxes (Safely Select)
+    const automationCheckbox = await driver.findElement(By.css("[data-testid='interest-automation']"));
+    const isAutomationChecked = await automationCheckbox.isSelected();
+    if (!isAutomationChecked) {
+      await automationCheckbox.click();
+      console.log("Checked the 'Automation' Checkbox");
     } else {
-      console.log("The 'Reading' Checkbox was already checked");
+      console.log("The 'Automation' Checkbox was already checked");
     }
 
-    // 4. Assertions
-    expect(await maleRadioBtn.isSelected()).toBe(true);
-    expect(await readingCheckbox.isSelected()).toBe(true);
+    // 4. Submit the form
+    const submitBtn = await driver.findElement(By.css("[data-testid='submit-btn']"));
+    await submitBtn.click();
+    console.log("Clicked Submit Button");
+
+    // 5. Assertions (Wait for success message)
+    const successMsg = await driver.wait(until.elementLocated(By.css("[data-testid='success-msg']")), 5000);
+    const msgText = await successMsg.getText();
+    expect(msgText).toEqual("Form submitted successfully!");
+    console.log(`Success Message Verified: ${msgText}`);
   });
 });
