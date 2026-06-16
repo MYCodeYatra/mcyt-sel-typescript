@@ -1,33 +1,39 @@
+import { AuthUtils } from "./utils/AuthUtils";
 import { ApiUtils } from "./utils/ApiUtils";
 import axios from "axios";
 
-// A mock endpoint that echoes the authorization headers
-// We are using httpbin.org to mock a secure endpoint
-describe("Phase 5 - API Testing: Authentication Tokens", () => {
-  
-  it("Should successfully inject a Bearer token into a secure request", async () => {
-    
-    // 1. In a real scenario, we would hit a login endpoint to get the token:
-    // const loginResponse = await ApiUtils.post("/login", { user: "admin", pass: "password" });
-    // const token = loginResponse.data.token;
-    
-    // For this demonstration, we will mock a JWT token
-    const mockJwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MockPayload.Signature";
+describe("Phase 6 - API Testing: Authentication APIs", () => {
+  let jwtToken: string;
 
-    // 2. We use httpbin.org to verify our headers were attached properly.
-    // httpbin is a public testing service that echoes the request data back.
-    const response = await axios.get("https://httpbin.org/bearer", {
-      headers: { "Authorization": `Bearer ${mockJwtToken}` }
+  beforeAll(async () => {
+    // 1. Authenticate before tests run to get the JWT
+    jwtToken = await AuthUtils.getAuthToken();
+    console.log(`Generated JWT Token: ${jwtToken.substring(0, 15)}...`);
+  });
+
+  it("Should access a protected route using the JWT token", async () => {
+    // 2. We use dummyjson.com's /auth/me endpoint to verify the token
+    const response = await axios.get("https://dummyjson.com/auth/me", {
+      headers: {
+        "Authorization": `Bearer ${jwtToken}`
+      }
     });
 
+    // 3. Validate the Response
     expect(response.status).toBe(200);
+    expect(response.data.username).toBe("emilys");
     
-    // 3. Verify the token was successfully transmitted
-    const responseBody = response.data;
-    expect(responseBody.authenticated).toBe(true);
-    expect(responseBody.token).toBe(mockJwtToken);
-    
-    console.log("Successfully authenticated with secure endpoint!");
+    console.log(`Successfully validated JWT Token for user: ${response.data.username}`);
+  });
+
+  it("Should fail when accessing a protected route without a token", async () => {
+    try {
+      await axios.get("https://dummyjson.com/auth/me");
+    } catch (error: any) {
+      // 4. Validate that a 401 Unauthorized or 403 Forbidden is returned
+      expect([401, 403]).toContain(error.response.status);
+      console.log(`Successfully blocked unauthorized access. Status: ${error.response.status}`);
+    }
   });
 
 });
