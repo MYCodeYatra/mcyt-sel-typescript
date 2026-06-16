@@ -1,0 +1,23 @@
+[
+  {
+    "scenario": "Valid User 1",
+    "username": "alice_admin",
+    "email": "alice@mycodeyatra.com",
+    "role": "Admin",
+    "expectedMessage": "User alice_admin created successfully."
+  },
+  {
+    "scenario": "Valid User 2",
+    "username": "bob_tester",
+    "email": "bob@mycodeyatra.com",
+    "role": "QA",
+    "expectedMessage": "User bob_tester created successfully."
+  },
+  {
+    "scenario": "Invalid Email",
+    "username": "charlie",
+    "email": "charlie_at_gmail.com",
+    "role": "Developer",
+    "expectedMessage": "Invalid email format."
+  }
+]
