@@ -7,14 +7,20 @@ export class ApiUtils {
   /**
    * Performs a robust HTTP GET request using the configured API_BASE_URL.
    */
-  static async get(endpoint: string): Promise<AxiosResponse> {
+  static async get(endpoint: string, token?: string): Promise<AxiosResponse> {
     const baseUrl = ConfigManager.get("API_BASE_URL");
     const fullUrl = `${baseUrl}${endpoint}`;
     
     Logger.info(`[API] Sending GET request to: ${fullUrl}`);
     
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      Logger.info(`[API] Injected Bearer Token into headers`);
+    }
+
     try {
-      const response = await axios.get(fullUrl);
+      const response = await axios.get(fullUrl, { headers });
       Logger.info(`[API] Received Status: ${response.status}`);
       return response;
     } catch (error: any) {
@@ -29,17 +35,21 @@ export class ApiUtils {
   /**
    * Performs an HTTP POST request to create data, accepting a JSON payload.
    */
-  static async post(endpoint: string, payload: any): Promise<AxiosResponse> {
+  static async post(endpoint: string, payload: any, token?: string): Promise<AxiosResponse> {
     const baseUrl = ConfigManager.get("API_BASE_URL");
     const fullUrl = `${baseUrl}${endpoint}`;
     
     Logger.info(`[API] Sending POST request to: ${fullUrl}`);
     Logger.info(`[API] Payload: ${JSON.stringify(payload)}`);
     
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      Logger.info(`[API] Injected Bearer Token into headers`);
+    }
+
     try {
-      const response = await axios.post(fullUrl, payload, {
-        headers: { "Content-Type": "application/json" }
-      });
+      const response = await axios.post(fullUrl, payload, { headers });
       Logger.info(`[API] Received Status: ${response.status}`);
       return response;
     } catch (error: any) {
