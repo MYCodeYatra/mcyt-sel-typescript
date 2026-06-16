@@ -7,4 +7,8 @@ module.exports = {
   verbose: true,
   // Enable parallel execution (max 3 workers to prevent memory overload locally)
   maxWorkers: 3,
+  reporters: [
+    "default",
+    "<rootDir>/tests/utils/CustomReporter.js"
+  ],
 };
