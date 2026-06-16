@@ -25,4 +25,29 @@ export class ApiUtils {
       throw error;
     }
   }
+
+  /**
+   * Performs an HTTP POST request to create data, accepting a JSON payload.
+   */
+  static async post(endpoint: string, payload: any): Promise<AxiosResponse> {
+    const baseUrl = ConfigManager.get("API_BASE_URL");
+    const fullUrl = `${baseUrl}${endpoint}`;
+    
+    Logger.info(`[API] Sending POST request to: ${fullUrl}`);
+    Logger.info(`[API] Payload: ${JSON.stringify(payload)}`);
+    
+    try {
+      const response = await axios.post(fullUrl, payload, {
+        headers: { "Content-Type": "application/json" }
+      });
+      Logger.info(`[API] Received Status: ${response.status}`);
+      return response;
+    } catch (error: any) {
+      Logger.error(`[API] POST request failed: ${error.message}`);
+      if (error.response) {
+        return error.response;
+      }
+      throw error;
+    }
+  }
 }
