@@ -8,8 +8,18 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "types": ["jest", "node"]
+    "types": [
+      "jest",
+      "node"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
-  "include": ["tests/**/*", "src/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "tests/**/*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
