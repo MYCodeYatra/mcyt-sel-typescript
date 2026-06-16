@@ -112,4 +112,29 @@ export class ApiUtils {
       throw error;
     }
   }
+
+  /**
+   * Performs an HTTP DELETE request to remove a resource.
+   */
+  static async delete(endpoint: string, token?: string): Promise<AxiosResponse> {
+    const baseUrl = ConfigManager.get("API_BASE_URL");
+    const fullUrl = `${baseUrl}${endpoint}`;
+    
+    Logger.info(`[API] Sending DELETE request to: ${fullUrl}`);
+    
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await axios.delete(fullUrl, { headers });
+      Logger.info(`[API] Received Status: ${response.status}`);
+      return response;
+    } catch (error: any) {
+      Logger.error(`[API] DELETE request failed: ${error.message}`);
+      if (error.response) return error.response;
+      throw error;
+    }
+  }
 }
